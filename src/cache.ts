@@ -1,5 +1,5 @@
 /**
- * @fileoverview this file provides methods handling dependency cache
+ * @fileoverview this file provides methods handling dependency  cache
  */
 
 import {join} from 'path';
