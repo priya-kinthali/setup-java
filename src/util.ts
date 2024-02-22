@@ -117,8 +117,9 @@ export function getVersionFromFileContent(
   content: string,
   distributionName: string
 ): string | null {
-  const javaVersionRegExp =
-    /(?:java\s)?v?(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
+  // const javaVersionRegExp =
+  //   /(?:java\s)?v?(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
+  const javaVersionRegExp = /^(?:java\s+)?v?(?<version>[^\s]+)$/m;
   const fileContent = content.match(javaVersionRegExp)?.groups?.version
     ? (content.match(javaVersionRegExp)?.groups?.version as string)
     : '';
