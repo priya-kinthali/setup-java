@@ -87889,9 +87889,11 @@ function isCacheFeatureAvailable() {
 exports.isCacheFeatureAvailable = isCacheFeatureAvailable;
 function getVersionFromFileContent(content, distributionName, versionFile) {
     var _a, _b, _c, _d, _e;
+    core.info(`version file is '${versionFile}'`);
     let javaVersionRegExp;
     if (versionFile == '.tool-versions') {
-        javaVersionRegExp = /^(?:java\s+)?v?(?<version>[^\s]+)$/m;
+        javaVersionRegExp = /java\s+(?<version>\d+(\.\d+)*)/;
+        core.info(`regex exp is '${javaVersionRegExp}'`);
     }
     else {
         javaVersionRegExp = /(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;

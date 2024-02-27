@@ -118,9 +118,11 @@ export function getVersionFromFileContent(
   distributionName: string,
   versionFile: string
 ): string | null {
+  core.info(`version file is '${versionFile}'`);
   let javaVersionRegExp: RegExp;
   if (versionFile == '.tool-versions') {
-    javaVersionRegExp = /^(?:java\s+)?v?(?<version>[^\s]+)$/m;
+    javaVersionRegExp = /java\s+(?<version>\d+(\.\d+)*)/;
+    core.info(`regex exp is '${javaVersionRegExp}'`);
   } else {
     javaVersionRegExp = /(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
   }
