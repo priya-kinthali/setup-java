@@ -125,8 +125,11 @@ export function getVersionFromFileContent(
   //const javaVersionRegExp = /(?<=^(java\s\w*-|java\s?v?|^))(\d+\.\d+(\.\d+)?)(?=\s|$)/;
   //const javaVersionRegExp = /(?<=^(java\s\w*-|java\s?v?|^))(\d+\.\d+\.\d+)(?=\s|$)/;
   //const javaVersionRegExp = /(java\s+)?(?<version>\d+\.\d+\.\d+)/;
-  const javaVersionRegExp =
-    /(?<=^(java\s\w*-|java\s?v?|^))(?<version>\d+\.\d+\.\d+)(?=\s|$)/;
+  // working const javaVersionRegExp =
+  //  /(?<=^(java\s\w*-|java\s?v?|^))(?<version>\d+\.\d+\.\d+)(?=\s|$)/;
+  //  const javaVersionRegExp =
+  //  /^(java\s\w*-|java\s?v?|^)?(\d+\.\d+\.\d+)(?=\s|$)/;
+  const javaVersionRegExp = /(?:java\s+)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
   //const javaVersionRegExp = /^(?:java\s+)?v?(?<version>[^\s]+)$/m;
   const fileContent = content.match(javaVersionRegExp)?.groups?.version
     ? (content.match(javaVersionRegExp)?.groups?.version as string)
