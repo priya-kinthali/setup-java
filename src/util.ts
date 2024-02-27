@@ -115,22 +115,15 @@ export function isCacheFeatureAvailable(): boolean {
 
 export function getVersionFromFileContent(
   content: string,
-  distributionName: string
+  distributionName: string,
+  versionFile: string
 ): string | null {
-  // const javaVersionRegExp =
-  //   /(?:java\s)?v?(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
-  // const javaVersionRegExp = /(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
-  // const javaVersionRegExp = /(?<=^java\s|^java\s?v|^java\s\w*-|^)(\d+\.\d+(\.\d+)?)(?=\s|$)/;
-  // const javaVersionRegExp = /(?<=^java\s|^java\s?v|^java\s\w*-|^|^)(\d+\.\d+(\.\d+)?)(?=\s|$)/;
-  //const javaVersionRegExp = /(?<=^(java\s\w*-|java\s?v?|^))(\d+\.\d+(\.\d+)?)(?=\s|$)/;
-  //const javaVersionRegExp = /(?<=^(java\s\w*-|java\s?v?|^))(\d+\.\d+\.\d+)(?=\s|$)/;
-  //const javaVersionRegExp = /(java\s+)?(?<version>\d+\.\d+\.\d+)/;
-  // working const javaVersionRegExp =
-  //  /(?<=^(java\s\w*-|java\s?v?|^))(?<version>\d+\.\d+\.\d+)(?=\s|$)/;
-  //  const javaVersionRegExp =
-  //  /^(java\s\w*-|java\s?v?|^)?(\d+\.\d+\.\d+)(?=\s|$)/;
-  const javaVersionRegExp = /(?:java\s+)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
-  //const javaVersionRegExp = /^(?:java\s+)?v?(?<version>[^\s]+)$/m;
+  let javaVersionRegExp: RegExp;
+  if (versionFile == '.tool-versions') {
+    javaVersionRegExp = /^(?:java\s+)?v?(?<version>[^\s]+)$/m;
+  } else {
+    javaVersionRegExp = /(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
+  }
   const fileContent = content.match(javaVersionRegExp)?.groups?.version
     ? (content.match(javaVersionRegExp)?.groups?.version as string)
     : '';
