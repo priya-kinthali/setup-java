@@ -87896,7 +87896,8 @@ function getVersionFromFileContent(content, distributionName) {
     // const javaVersionRegExp = /(?<=^java\s|^java\s?v|^java\s\w*-|^|^)(\d+\.\d+(\.\d+)?)(?=\s|$)/;
     //const javaVersionRegExp = /(?<=^(java\s\w*-|java\s?v?|^))(\d+\.\d+(\.\d+)?)(?=\s|$)/;
     //const javaVersionRegExp = /(?<=^(java\s\w*-|java\s?v?|^))(\d+\.\d+\.\d+)(?=\s|$)/;
-    const javaVersionRegExp = /(java\s+)?(?<version>\d+\.\d+\.\d+)/;
+    //const javaVersionRegExp = /(java\s+)?(?<version>\d+\.\d+\.\d+)/;
+    const javaVersionRegExp = /(?<=^(java\s\w*-|java\s?v?|^))(?<version>\d+\.\d+\.\d+)(?=\s|$)/;
     //const javaVersionRegExp = /^(?:java\s+)?v?(?<version>[^\s]+)$/m;
     const fileContent = ((_b = (_a = content.match(javaVersionRegExp)) === null || _a === void 0 ? void 0 : _a.groups) === null || _b === void 0 ? void 0 : _b.version)
         ? (_d = (_c = content.match(javaVersionRegExp)) === null || _c === void 0 ? void 0 : _c.groups) === null || _d === void 0 ? void 0 : _d.version
