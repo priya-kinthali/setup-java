@@ -87897,7 +87897,11 @@ function getVersionFromFileContent(content, distributionName, versionFile) {
         //javaVersionRegExp = /(?:java\s*v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
         //javaVersionRegExp = /(?:java\s*v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
         //javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
-        javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
+        // javaVersionRegExp = /(?:java\s*(?:v?\s*\w*-)?)?(?<version>\d+(\.\d+)*(\+\d+(\.\d+)*)?)(?=\s|$)/;
+        // javaVersionRegExp = /(?:java\s*(?:v?\s*\w*-)?)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
+        // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/
+        // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
+        javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
         core.info(`regex exp is '${javaVersionRegExp}'`);
     }
     else {
