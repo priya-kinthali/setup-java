@@ -87902,7 +87902,7 @@ function getVersionFromFileContent(content, distributionName, versionFile) {
         // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/
         // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
         //javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
-        javaVersionRegExp = /java (\S+-)?(\d+(\.\d+)*)/;
+        javaVersionRegExp = /java openjdk64-(\d+(\.\d+)*)/;
         core.info(`regex exp is '${javaVersionRegExp}'`);
     }
     else {
