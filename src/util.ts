@@ -130,7 +130,9 @@ export function getVersionFromFileContent(
     // javaVersionRegExp = /(?:java\s*(?:v?\s*\w*-)?)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
     // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/
     // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
-    javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
+    //javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
+    javaVersionRegExp = /java (\S+-)?(\d+(\.\d+)*)/;
+
     core.info(`regex exp is '${javaVersionRegExp}'`);
   } else {
     javaVersionRegExp = /(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
