@@ -87911,6 +87911,7 @@ function getVersionFromFileContent(content, distributionName, versionFile) {
     const fileContent = ((_b = (_a = content.match(javaVersionRegExp)) === null || _a === void 0 ? void 0 : _a.groups) === null || _b === void 0 ? void 0 : _b.version)
         ? (_d = (_c = content.match(javaVersionRegExp)) === null || _c === void 0 ? void 0 : _c.groups) === null || _d === void 0 ? void 0 : _d.version
         : '';
+    core.info(`Version from file '${fileContent}'`);
     if (!fileContent) {
         return null;
     }

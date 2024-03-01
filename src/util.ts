@@ -137,9 +137,11 @@ export function getVersionFromFileContent(
   } else {
     javaVersionRegExp = /(?<version>(?<=(^|\s|-))(\d+\S*))(\s|$)/;
   }
+
   const fileContent = content.match(javaVersionRegExp)?.groups?.version
     ? (content.match(javaVersionRegExp)?.groups?.version as string)
     : '';
+  core.info(`Version from file '${fileContent}'`);
   if (!fileContent) {
     return null;
   }
