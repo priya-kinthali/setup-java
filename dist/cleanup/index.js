@@ -87890,6 +87890,7 @@ exports.isCacheFeatureAvailable = isCacheFeatureAvailable;
 function getVersionFromFileContent(content, distributionName, versionFile) {
     var _a, _b, _c, _d, _e;
     core.info(`version file is '${versionFile}'`);
+    core.info(`content is '${content}'`);
     let javaVersionRegExp;
     if (versionFile == '.tool-versions') {
         //javaVersionRegExp = /(?:java\s+\S*-)?(?<version>\d+(\.\d+)*)/;
@@ -87901,8 +87902,7 @@ function getVersionFromFileContent(content, distributionName, versionFile) {
         // javaVersionRegExp = /(?:java\s*(?:v?\s*\w*-)?)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
         // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/
         // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
-        //javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
-        javaVersionRegExp = /java openjdk64-(\d+(\.\d+)*)/;
+        javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
         core.info(`regex exp is '${javaVersionRegExp}'`);
     }
     else {
@@ -87915,6 +87915,7 @@ function getVersionFromFileContent(content, distributionName, versionFile) {
         return null;
     }
     core.debug(`Version from file '${fileContent}'`);
+    core.info(`Version from file '${fileContent}'`);
     const tentativeVersion = avoidOldNotation(fileContent);
     const rawVersion = tentativeVersion.split('-')[0];
     let version = semver.validRange(rawVersion)

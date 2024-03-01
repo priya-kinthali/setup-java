@@ -119,6 +119,7 @@ export function getVersionFromFileContent(
   versionFile: string
 ): string | null {
   core.info(`version file is '${versionFile}'`);
+  core.info(`content is '${content}'`);
   let javaVersionRegExp: RegExp;
   if (versionFile == '.tool-versions') {
     //javaVersionRegExp = /(?:java\s+\S*-)?(?<version>\d+(\.\d+)*)/;
@@ -130,8 +131,7 @@ export function getVersionFromFileContent(
     // javaVersionRegExp = /(?:java\s*(?:v?\s*\w*-)?)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
     // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/
     // javaVersionRegExp = /java\s*(?:v?\s*\w*-)?(?<version>\d+(\.\d+)*)(?=\s|$)/;
-    //javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
-    javaVersionRegExp = /java openjdk64-(\d+(\.\d+)*)/;
+    javaVersionRegExp = /(?<=java\s)(?<=(^|\s|-))(\d+\S*)(\s|$)/;
 
     core.info(`regex exp is '${javaVersionRegExp}'`);
   } else {
@@ -145,6 +145,7 @@ export function getVersionFromFileContent(
   }
 
   core.debug(`Version from file '${fileContent}'`);
+  core.info(`Version from file '${fileContent}'`);
 
   const tentativeVersion = avoidOldNotation(fileContent);
   const rawVersion = tentativeVersion.split('-')[0];
