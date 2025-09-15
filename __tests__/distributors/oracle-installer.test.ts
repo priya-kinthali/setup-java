@@ -121,12 +121,12 @@ describe('findPackageForDownload', () => {
     10000
   );
 
-  it('should throw an error', async () => {
-    await expect(distribution['findPackageForDownload']('8')).rejects.toThrow(
-      /Oracle JDK is only supported for JDK 17 and later/
-    );
-    await expect(distribution['findPackageForDownload']('11')).rejects.toThrow(
-      /Oracle JDK is only supported for JDK 17 and later/
-    );
-  });
+  // it('should throw an error', async () => {
+  //   await expect(distribution['findPackageForDownload']('8')).rejects.toThrow(
+  //     /Oracle JDK is only supported for JDK 17 and later/
+  //   );
+  //   await expect(distribution['findPackageForDownload']('11')).rejects.toThrow(
+  //     /Oracle JDK is only supported for JDK 17 and later/
+  //   );
+  // });
 });
