@@ -79,7 +79,7 @@ export abstract class JavaBase {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
           core.error(
-            `Java setup failed due to network issue or timeout: ${message}`
+            `Java setup failed: An error occurred while resolving or downloading the Java distribution: ${message}`
           );
         }
         if (error instanceof Error && error.stack) {
