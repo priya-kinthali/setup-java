@@ -62,6 +62,7 @@ export abstract class JavaBase {
           core.info(`Java ${foundJava.version} was downloaded`);
         }
       } catch (error: any) {
+        core.info(`Full error object: ${JSON.stringify(error, null, 2)}`);
         if (error instanceof tc.HTTPError) {
           if (error.httpStatusCode === 403) {
             core.error('HTTP 403: Permission denied or access restricted.');
@@ -69,6 +70,10 @@ export abstract class JavaBase {
             core.warning('HTTP 429: Rate limit exceeded. Please retry later.');
           } else {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
+          }
+        } else if (Array.isArray((error as any).errors)) {
+          for (const err of error.errors) {
+            core.error('Error: ${err.message}');
           }
         } else {
           const message =
