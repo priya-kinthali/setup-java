@@ -62,7 +62,7 @@ export abstract class JavaBase {
           core.info(`Java ${foundJava.version} was downloaded`);
         }
       } catch (error: any) {
-        core.info(`Full error object: ${JSON.stringify(error, null, 2)}`);
+        core.info(`Full error object: ${error}`);
         if (error instanceof tc.HTTPError) {
           if (error.httpStatusCode === 403) {
             core.error('HTTP 403: Permission denied or access restricted.');
