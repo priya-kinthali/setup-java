@@ -113,8 +113,11 @@ export abstract class JavaBase {
             core.debug(`Port: ${port}`);
             core.debug(`Local Address: ${localAddress}`);
             core.debug(`Message: ${message}`);
+            // // Construct the log message
+            // const logMessage = `Error: ${message}${endpoint ? ` ${endpoint}${port}` : ''}${localAddress}`;
+            // core.error(logMessage);
             // Construct the log message
-            const logMessage = `Error: ${message}${endpoint ? ` ${endpoint}${port}` : ''}${localAddress}`;
+            const logMessage = `Error: ${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${localAddress ? ` Local (${localAddress})` : ''}`;
             core.error(logMessage);
           }
         } else {
