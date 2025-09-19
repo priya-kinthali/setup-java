@@ -73,7 +73,7 @@ export abstract class JavaBase {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
           }
         } else if (error && error.errors && Array.isArray(error.errors)) {
-          core.error(`Java setup failed with ${error.errors.length} error(s):`);
+          core.error(`Java setup failed with:`);
           for (const err of error.errors) {
             const endpoint =
               err?.config?.url || err?.address || err?.hostname || '';
@@ -82,8 +82,9 @@ export abstract class JavaBase {
               ? ` Local (${err.localAddress})`
               : '';
             const message = err?.message || 'Aggregate error';
-
-            // Handle specific error codes
+            const logMessage = `Error: ${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${localAddress ? ` Local (${localAddress})` : ''}`;
+            core.error(logMessage);
+            //specific error codes
             switch (err?.code) {
               case 'EACCES':
                 core.debug(
@@ -108,17 +109,6 @@ export abstract class JavaBase {
               default:
                 core.debug('An unknown error occurred.');
             }
-            // Debug logs for each value
-            core.debug(`Endpoint: ${endpoint}`);
-            core.debug(`Port: ${port}`);
-            core.debug(`Local Address: ${localAddress}`);
-            core.debug(`Message: ${message}`);
-            // // Construct the log message
-            // const logMessage = `Error: ${message}${endpoint ? ` ${endpoint}${port}` : ''}${localAddress}`;
-            // core.error(logMessage);
-            // Construct the log message
-            const logMessage = `Error: ${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${localAddress ? ` Local (${localAddress})` : ''}`;
-            core.error(logMessage);
           }
         } else {
           const message =
