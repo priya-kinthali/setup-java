@@ -78,6 +78,53 @@ export abstract class JavaBase {
           core.error(
             `Java setup failed due to network issue or timeout: ${message}`
           );
+          // Log specific error details
+          const errorMessage = error.message || 'No error message available';
+          const errorCode = error.code || 'No error code available';
+          const errorStack = error.stack || 'No stack trace available';
+
+          core.error(`Error message: ${errorMessage}`);
+          core.error(`Error code: ${errorCode}`);
+          core.error(`Stack trace: ${errorStack}`);
+          // Check for network-related errors and log endpoint/IP if available
+          if (errorCode === 'EACCES') {
+            core.error(
+              'Permission denied. Check your network or file access permissions.'
+            );
+          } else if (errorCode === 'ETIMEDOUT') {
+            core.error(
+              'Connection timed out. Check the endpoint or network stability.'
+            );
+          }
+
+          // Attempt to log endpoint/IP if present in the error object
+          if (error.address || error.port) {
+            core.error(
+              `Failed to connect to endpoint: ${error.address}:${error.port}`
+            );
+          }
+          // Handle the `errors` property if it exists
+          if (Array.isArray(error.errors)) {
+            core.error('The error contains multiple sub-errors:');
+            error.errors.forEach((subError: any, index: number) => {
+              const subErrorMessage =
+                subError.message || 'No sub-error message available';
+              const subErrorCode =
+                subError.code || 'No sub-error code available';
+              const subErrorStack =
+                subError.stack || 'No sub-error stack trace available';
+
+              core.error(`Sub-error ${index + 1}:`);
+              core.error(`  Message: ${subErrorMessage}`);
+              core.error(`  Code: ${subErrorCode}`);
+              core.error(`  Stack: ${subErrorStack}`);
+
+              // Log endpoint/IP for sub-errors if available
+              if (subError.address || subError.port) {
+                core.error(`  Endpoint: ${subError.address}:${subError.port}`);
+              }
+            });
+          }
         }
         if (error instanceof Error && error.stack) {
           core.debug(error.stack);
