@@ -74,29 +74,6 @@ export abstract class JavaBase {
           }
         } else if (error && error.errors && Array.isArray(error.errors)) {
           core.error(`Java setup failed with ${error.errors.length} error(s):`);
-          const errorCode = error.code || 'No error code available';
-          core.debug(`Error code: ${errorCode}`);
-
-          // Handle specific error codes
-          switch (errorCode) {
-            case 'EACCES':
-              core.debug(
-                'Permission denied. Check your network or file access permissions.'
-              );
-              break;
-            case 'ETIMEDOUT':
-              core.debug(
-                'Connection timed out. Check the endpoint or network stability.'
-              );
-              break;
-            case 'ECONNREFUSED':
-              core.debug(
-                'Connection refused. Ensure the endpoint is reachable.'
-              );
-              break;
-            default:
-              core.debug('An unknown error occurred.');
-          }
           for (const err of error.errors) {
             const endpoint =
               err?.config?.url || err?.address || err?.hostname || '';
@@ -106,6 +83,36 @@ export abstract class JavaBase {
               : '';
             const message = err?.message || 'Aggregate error';
 
+            // Handle specific error codes
+            switch (err?.code) {
+              case 'EACCES':
+                core.debug(
+                  'Permission denied. Check your network or file access permissions.'
+                );
+                break;
+              case 'ETIMEDOUT':
+                core.debug(
+                  'Connection timed out. Check the endpoint or network stability.'
+                );
+                break;
+              case 'ECONNREFUSED':
+                core.debug(
+                  'Connection refused. Ensure the endpoint is reachable.'
+                );
+                break;
+              case 'ENETUNREACH':
+                core.debug(
+                  'Network is unreachable. Verify your network connection and routing.'
+                );
+                break;
+              default:
+                core.debug('An unknown error occurred.');
+            }
+            // Debug logs for each value
+            core.debug(`Endpoint: ${endpoint}`);
+            core.debug(`Port: ${port}`);
+            core.debug(`Local Address: ${localAddress}`);
+            core.debug(`Message: ${message}`);
             // Construct the log message
             const logMessage = `Error: ${message}${endpoint ? ` ${endpoint}${port}` : ''}${localAddress}`;
             core.error(logMessage);
@@ -114,7 +121,7 @@ export abstract class JavaBase {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
           core.error(
-            `Java setup need to changefailed due to network issue or timeout: ${message}`
+            `Java setup failed: An error occurred while resolving or downloading the Java distribution. Details: ${message}`
           );
         }
         if (error instanceof Error && error.stack) {
