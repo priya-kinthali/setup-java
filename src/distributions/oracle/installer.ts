@@ -94,9 +94,9 @@ export class OracleDistribution extends JavaBase {
       `${ORACLE_DL_BASE}/${major}/archive/jdk-${range}_${platform}-${arch}_bin.${extension}`
     );
 
-    // if (parseInt(major) < 17) {
-    //   throw new Error('Oracle JDK is only supported for JDK 17 and later');
-    // }
+    if (parseInt(major) < 17) {
+      throw new Error('Oracle JDK is only supported for JDK 17 and later');
+    }
 
     for (const url of possibleUrls) {
       const response = await this.http.head(url);
