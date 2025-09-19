@@ -73,7 +73,7 @@ export abstract class JavaBase {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
           }
         } else if (error && error.errors && Array.isArray(error.errors)) {
-          core.error(`Java setup failed with:`);
+          core.error(`Java setup failed with error(s):`);
           for (const err of error.errors) {
             const endpoint =
               err?.config?.url || err?.address || err?.hostname || '';
@@ -113,7 +113,7 @@ export abstract class JavaBase {
         } else {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
-          core.error(`Unable to resolve or download the Java distribution.`);
+          core.error(`Unable to resolve or download the Java distribution`);
           core.debug(`Message: ${message}`);
         }
         if (error instanceof Error && error.stack) {
