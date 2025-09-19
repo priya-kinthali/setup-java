@@ -114,7 +114,7 @@ export abstract class JavaBase {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
           core.error(
-            `An error occurred while resolving or downloading the Java distribution.`
+            `Java setup failed. An error occurred while resolving or downloading the Java distribution.`
           );
           core.debug(`Details: ${message}`);
         }
