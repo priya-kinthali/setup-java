@@ -58,8 +58,37 @@ export abstract class JavaBase {
           core.info(`Resolved Java ${foundJava.version} from tool-cache`);
         } else {
           core.info('Trying to download...');
-          foundJava = await this.downloadTool(javaRelease);
-          core.info(`Java ${foundJava.version} was downloaded`);
+          // foundJava = await this.downloadTool(javaRelease);
+          // core.info(`Java ${foundJava.version} was downloaded`);
+          // Simulate multiple download attempts with potential timeouts
+          const downloadAttempts = [
+            this.simulateDownloadWithTimeout(javaRelease, 1),
+            this.simulateDownloadWithTimeout(javaRelease, 2),
+            this.simulateDownloadWithTimeout(javaRelease, 3)
+          ];
+
+          // Wait for all attempts to settle
+          const results = await Promise.allSettled(downloadAttempts);
+
+          // Process results
+          const successfulResult = results.find(
+            result => result.status === 'fulfilled'
+          ) as PromiseFulfilledResult<JavaInstallerResults> | undefined;
+
+          if (successfulResult) {
+            foundJava = successfulResult.value;
+            core.info(`Java ${foundJava.version} was downloaded`);
+          } else {
+            // Collect all errors from failed attempts
+            const errorMessages = results
+              .filter(result => result.status === 'rejected')
+              .map(result => (result as PromiseRejectedResult).reason.message);
+
+            // Throw a generic error with combined messages
+            throw new Error(
+              `All download attempts failed: ${errorMessages.join('; ')}`
+            );
+          }
         }
       } catch (error: any) {
         const allProperties = Object.getOwnPropertyNames(error);
@@ -99,6 +128,22 @@ export abstract class JavaBase {
     this.setJavaDefault(foundJava.version, foundJava.path);
 
     return foundJava;
+  }
+  // Helper method to simulate a download with a timeout
+  private async simulateDownloadWithTimeout(
+    javaRelease: any,
+    attempt: number
+  ): Promise<JavaInstallerResults> {
+    return new Promise((resolve, reject) => {
+      const timeout = Math.random() > 0.5; // Randomly fail or succeed
+      setTimeout(() => {
+        if (timeout) {
+          reject(new Error(`Download attempt ${attempt} timed out`));
+        } else {
+          resolve({version: javaRelease.version} as JavaInstallerResults);
+        }
+      }, 1000);
+    });
   }
 
   protected get toolcacheFolderName(): string {
