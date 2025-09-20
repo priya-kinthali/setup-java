@@ -70,13 +70,12 @@ export abstract class JavaBase {
           } else {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
           }
+          if (error instanceof Error && error.stack) core.debug(error.stack);
         } else if (error && error.errors && Array.isArray(error.errors)) {
           core.error(
             `Java setup failed due to network or configuration error(s)`
           );
-          if (error instanceof Error && error.stack) {
-            core.debug(error.stack);
-          }
+          if (error instanceof Error && error.stack) core.debug(error.stack);
           for (const err of error.errors) {
             const endpoint =
               err?.config?.url || err?.address || err?.hostname || '';
@@ -93,9 +92,7 @@ export abstract class JavaBase {
           core.error(
             `Unable to resolve or download the Java distribution: ${message}`
           );
-          if (error instanceof Error && error.stack) {
-            core.debug(error.stack);
-          }
+          if (error instanceof Error && error.stack) core.debug(error.stack);
         }
         throw error;
       }
