@@ -72,7 +72,7 @@ export abstract class JavaBase {
           }
         } else if (error && error.errors && Array.isArray(error.errors)) {
           core.error(
-            `Java setup failed due to network/timeout or configuration error(s)`
+            `Java setup failed due to network or configuration error(s)`
           );
           for (const err of error.errors) {
             const endpoint =
@@ -81,6 +81,7 @@ export abstract class JavaBase {
             const message = err?.message || 'Aggregate error';
             const logMessage = `Error: ${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
             core.error(logMessage);
+            core.debug(`  ${err.stack || err.message}`);
             core.debug(JSON.stringify(err, null, 2));
           }
         } else {
@@ -89,9 +90,9 @@ export abstract class JavaBase {
           core.error(
             `Unable to resolve or download the Java distribution: ${message}`
           );
-        }
-        if (error instanceof Error && error.stack) {
-          core.debug(error.stack);
+          if (error instanceof Error && error.stack) {
+            core.debug(error.stack);
+          }
         }
         throw error;
       }
