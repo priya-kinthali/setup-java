@@ -62,8 +62,6 @@ export abstract class JavaBase {
           core.info(`Java ${foundJava.version} was downloaded`);
         }
       } catch (error: any) {
-        const allProperties = Object.getOwnPropertyNames(error);
-        core.info(`All error properties: ${allProperties.join(', ')}`);
         if (error instanceof tc.HTTPError) {
           if (error.httpStatusCode === 403) {
             core.error('HTTP 403: Permission denied or access restricted.');
@@ -73,8 +71,14 @@ export abstract class JavaBase {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
           }
         } else if (error && error.errors && Array.isArray(error.errors)) {
-          core.error(`Java setup failed with error(s):`);
+          core.error(
+            `Java setup failed due to network/timeout or configuration error(s)`
+          );
           for (const err of error.errors) {
+            core.warning('Error object:', err);
+            core.warning(
+              `Inspecting error object: ${JSON.stringify(err, null, 2)}`
+            );
             const endpoint =
               err?.config?.url || err?.address || err?.hostname || '';
             const port = err?.port ? `:${err.port}` : '';
@@ -84,37 +88,13 @@ export abstract class JavaBase {
             const message = err?.message || 'Aggregate error';
             const logMessage = `Error: ${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${localAddress ? ` Local (${localAddress})` : ''}`;
             core.error(logMessage);
-            //specific error codes
-            switch (err?.code) {
-              case 'EACCES':
-                core.debug(
-                  'Permission denied. Check your network or file access permissions.'
-                );
-                break;
-              case 'ETIMEDOUT':
-                core.debug(
-                  'Connection timed out. Check the endpoint or network stability.'
-                );
-                break;
-              case 'ECONNREFUSED':
-                core.debug(
-                  'Connection refused. Ensure the endpoint is reachable.'
-                );
-                break;
-              case 'ENETUNREACH':
-                core.debug(
-                  'Network is unreachable. Verify your network connection and routing.'
-                );
-                break;
-              default:
-                core.debug('An unknown error occurred.');
-            }
           }
         } else {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
-          core.error(`Unable to resolve or download the Java distribution`);
-          core.debug(`Message: ${message}`);
+          core.error(
+            `Unable to resolve or download the Java distribution: ${message}`
+          );
         }
         if (error instanceof Error && error.stack) {
           core.debug(error.stack);
