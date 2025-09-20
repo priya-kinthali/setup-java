@@ -74,12 +74,15 @@ export abstract class JavaBase {
           core.error(
             `Java setup failed due to network or configuration error(s)`
           );
+          if (error instanceof Error && error.stack) {
+            core.debug(error.stack);
+          }
           for (const err of error.errors) {
             const endpoint =
               err?.config?.url || err?.address || err?.hostname || '';
             const port = err?.port ? `:${err.port}` : '';
             const message = err?.message || 'Aggregate error';
-            const logMessage = `Error: ${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
+            const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
             core.error(logMessage);
             core.debug(`  ${err.stack || err.message}`);
             core.debug(JSON.stringify(err, null, 2));
