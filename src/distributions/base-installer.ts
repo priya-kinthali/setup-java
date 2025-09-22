@@ -88,13 +88,11 @@ export abstract class JavaBase {
             core.error(logMessage);
             core.debug(`  ${err.stack || err.message}`);
             core.debug(JSON.stringify(err, null, 2));
-        }
+          }
         } else {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
-            core.error(
-              `Java setup process failed due to: ${message}`
-            );
+          core.error(`Java setup process failed due to: ${message}`);
           if (error instanceof Error && error.stack) {
             core.debug(error.stack);
           }
