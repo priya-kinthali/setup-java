@@ -86,7 +86,7 @@ export abstract class JavaBase {
             const message = err?.message || 'Aggregate error';
             const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
             core.error(logMessage);
-            core.debug(`  ${err.stack || err.message}`);
+            core.debug(`${err.stack || err.message}`);
             core.debug(JSON.stringify(err, null, 2));
           }
         } else {
