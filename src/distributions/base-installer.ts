@@ -77,8 +77,7 @@ export abstract class JavaBase {
           );
           if (error instanceof Error && error.stack) core.debug(error.stack);
           for (const err of error.errors) {
-            const endpoint =
-              err?.config?.url || err?.address || err?.hostname || '';
+            const endpoint = err?.address || err?.hostname || '';
             const port = err?.port ? `:${err.port}` : '';
             const message = err?.message || 'Aggregate error';
             const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
