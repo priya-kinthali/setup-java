@@ -70,15 +70,34 @@ export abstract class JavaBase {
           } else {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
           }
+          if (error instanceof Error && error.stack) {
+            core.debug(error.stack);
+          }
+        } else if (error && error.errors && Array.isArray(error.errors)) {
+          core.error(
+            `Java setup failed due to network or configuration error(s)`
+          );
+          if (error instanceof Error && error.stack) {
+            core.debug(error.stack);
+          }
+          for (const err of error.errors) {
+            const endpoint = err?.address || err?.hostname || '';
+            const port = err?.port ? `:${err.port}` : '';
+            const message = err?.message || 'Aggregate error';
+            const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
+            core.error(logMessage);
+            core.debug(`  ${err.stack || err.message}`);
+            core.debug(JSON.stringify(err, null, 2));
+        }
         } else {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
-          core.error(
-            `Java setup failed due to network issue or timeout: ${message}`
-          );
-        }
-        if (error instanceof Error && error.stack) {
-          core.debug(error.stack);
+            core.error(
+              `Java setup process failed due to: ${message}`
+            );
+          if (error instanceof Error && error.stack) {
+            core.debug(error.stack);
+          }
         }
         throw error;
       }
