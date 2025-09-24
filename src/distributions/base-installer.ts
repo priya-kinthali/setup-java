@@ -51,18 +51,20 @@ export abstract class JavaBase {
       core.info(`Resolved Java ${foundJava.version} from tool-cache`);
     } else {
       core.info('Trying to resolve the latest version from remote');
-      try {
-        // Simulate an HTTP error with a mock object
-        const mockError = {
-          name: 'HTTPError',
-          message: 'Permission denied or access restricted.',
-          httpStatusCode: 403,
-          stack:
-            'Error: Permission denied\n    at someFunction (file.js:10:15)\n    at anotherFunction (file.js:20:25)'
-        };
+      // Mocking tc.HTTPError class
+      class MockHTTPError extends Error {
+        httpStatusCode: number;
 
-        // Throw the mock error
-        throw mockError;
+        constructor(httpStatusCode: number, message: string) {
+          super(message);
+          this.name = 'HTTPError';
+          this.httpStatusCode = httpStatusCode;
+          Object.setPrototypeOf(this, new.target.prototype); // Restore prototype chain
+        }
+      }
+      try {
+        // Simulate an HTTP error by throwing an instance of MockHTTPError
+        throw new MockHTTPError(403, 'Permission denied or access restricted.');
       } catch (error: any) {
         if (error instanceof tc.HTTPError) {
           if (error.httpStatusCode === 403) {
