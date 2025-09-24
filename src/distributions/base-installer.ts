@@ -70,9 +70,6 @@ export abstract class JavaBase {
           } else {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
           }
-          if (error instanceof Error && error.stack) {
-            core.debug(error.stack);
-          }
         } else if (error && error.errors && Array.isArray(error.errors)) {
           core.error(
             `Java setup failed due to network or configuration error(s)`
@@ -96,6 +93,14 @@ export abstract class JavaBase {
           if (error instanceof Error && error.stack) {
             core.debug(error.stack);
           }
+          const errorDetails = {
+            name: error.name,
+            message: error.message,
+            ...Object.getOwnPropertyNames(error)
+              .filter(prop => !['name', 'message', 'stack'].includes(prop))
+              .reduce((acc, prop) => ({...acc, [prop]: error[prop]}), {})
+          };
+          core.debug(`${JSON.stringify(errorDetails, null, 2)}`);
         }
         throw error;
       }
