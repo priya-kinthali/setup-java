@@ -98,14 +98,15 @@ export abstract class JavaBase {
           if (error instanceof Error && error.stack) {
             core.debug(error.stack);
           }
-          const errorDetails = {
-            name: error.name,
-            message: error.message,
-            ...Object.getOwnPropertyNames(error)
-              .filter(prop => !['name', 'message', 'stack'].includes(prop))
-              .reduce((acc, prop) => ({ ...acc, [prop]: error[prop] }), {})
-          };
-          core.debug(`Error Details: ${JSON.stringify(errorDetails, null, 2)}`);
+          core.debug(JSON.stringify(error, null, 2));
+          // const errorDetails = {
+          //   name: error.name,
+          //   message: error.message,
+          //   ...Object.getOwnPropertyNames(error)
+          //     .filter(prop => !['name', 'message', 'stack'].includes(prop))
+          //     .reduce((acc, prop) => ({ ...acc, [prop]: error[prop] }), {})
+          // };
+          // core.debug(`${JSON.stringify(errorDetails, null, 2)}`);
         }
         throw error;
       }
