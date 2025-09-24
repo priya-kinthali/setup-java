@@ -97,7 +97,16 @@ export abstract class JavaBase {
           core.error(`Java setup process failed due to: ${message}`);
           if (error instanceof Error && error.stack) {
             core.debug(error.stack);
-            core.debug(JSON.stringify(Object.assign({}, error), null, 2));          }
+          }
+          const errorDetails = {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+            ...Object.getOwnPropertyNames(error)
+              .filter(prop => !['name', 'message', 'stack'].includes(prop))
+              .reduce((acc, prop) => ({...acc, [prop]: error[prop]}), {})
+          };
+          core.debug(`Error Details: ${JSON.stringify(errorDetails, null, 2)}`);
         }
         throw error;
       }
