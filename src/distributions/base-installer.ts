@@ -101,10 +101,9 @@ export abstract class JavaBase {
           const errorDetails = {
             name: error.name,
             message: error.message,
-            stack: error.stack,
             ...Object.getOwnPropertyNames(error)
               .filter(prop => !['name', 'message', 'stack'].includes(prop))
-              .reduce((acc, prop) => ({...acc, [prop]: error[prop]}), {})
+              .reduce((acc, prop) => ({ ...acc, [prop]: error[prop] }), {})
           };
           core.debug(`Error Details: ${JSON.stringify(errorDetails, null, 2)}`);
         }
