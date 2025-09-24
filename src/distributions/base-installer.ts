@@ -52,15 +52,17 @@ export abstract class JavaBase {
     } else {
       core.info('Trying to resolve the latest version from remote');
       try {
-        const javaRelease = await this.findPackageForDownload(this.version);
-        core.info(`Resolved latest version as ${javaRelease.version}`);
-        if (foundJava?.version === javaRelease.version) {
-          core.info(`Resolved Java ${foundJava.version} from tool-cache`);
-        } else {
-          core.info('Trying to download...');
-          foundJava = await this.downloadTool(javaRelease);
-          core.info(`Java ${foundJava.version} was downloaded`);
-        }
+        // Simulate an HTTP error with a mock object
+        const mockError = {
+          name: 'HTTPError',
+          message: 'Permission denied or access restricted.',
+          httpStatusCode: 403,
+          stack:
+            'Error: Permission denied\n    at someFunction (file.js:10:15)\n    at anotherFunction (file.js:20:25)'
+        };
+
+        // Throw the mock error
+        throw mockError;
       } catch (error: any) {
         if (error instanceof tc.HTTPError) {
           if (error.httpStatusCode === 403) {
