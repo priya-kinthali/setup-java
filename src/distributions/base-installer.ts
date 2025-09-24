@@ -97,7 +97,7 @@ export abstract class JavaBase {
           core.error(`Java setup process failed due to: ${message}`);
           if (error instanceof Error && error.stack) {
             core.debug(error.stack);
-            core.debug(JSON.stringify(error, null, 2));
+            core.debug(JSON.stringify({ ...error }, null, 2));
           }
         }
         throw error;
