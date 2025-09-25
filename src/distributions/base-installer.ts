@@ -70,15 +70,41 @@ export abstract class JavaBase {
           } else {
             core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
           }
+        } else if (error && error.errors && Array.isArray(error.errors)) {
+          core.error(
+            `Java setup failed due to network or configuration error(s)`
+          );
+          if (error instanceof Error && error.stack) {
+            core.debug(error.stack);
+          }
+          for (const err of error.errors) {
+            const endpoint = err?.address || err?.hostname || '';
+            const port = err?.port ? `:${err.port}` : '';
+            const message = err?.message || 'Aggregate error';
+            const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
+            core.error(logMessage);
+            core.debug(`${err.stack || err.message}`);
+            Object.entries(err).forEach(([key, value]) => {
+              core.debug(`"${key}": ${JSON.stringify(value)}`);
+            });
+          }
         } else {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
-          core.error(
-            `Java setup failed due to network issue or timeout: ${message}`
-          );
-        }
-        if (error instanceof Error && error.stack) {
-          core.debug(error.stack);
+          core.error(`Java setup process failed due to: ${message}`);
+          if (typeof error?.code === 'string') {
+            core.debug(error.stack);
+          }
+          const errorDetails = {
+            name: error.name,
+            message: error.message,
+            ...Object.getOwnPropertyNames(error)
+              .filter(prop => !['name', 'message', 'stack'].includes(prop))
+              .reduce((acc, prop) => ({...acc, [prop]: error[prop]}), {})
+          };
+          Object.entries(errorDetails).forEach(([key, value]) => {
+            core.debug(`"${key}": ${JSON.stringify(value)}`);
+          });
         }
         throw error;
       }
