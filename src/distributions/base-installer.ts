@@ -90,9 +90,9 @@ export abstract class JavaBase {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
           core.error(`Java setup process failed due to: ${message}`);
-          if (error instanceof Error && error.stack) {
-            core.debug(error.stack);
-          }
+          // if (error instanceof Error && error.stack) {
+          //   core.debug(error.stack);
+          // }
           const errorDetails = {
             name: error.name,
             message: error.message,
