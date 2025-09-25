@@ -84,7 +84,6 @@ export abstract class JavaBase {
             const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
             core.error(logMessage);
             core.debug(`${err.stack || err.message}`);
-            // core.debug(JSON.stringify(err, null, 2));
             Object.entries(err).forEach(([key, value]) => {
               core.debug(`"${key}": ${JSON.stringify(value)}`);
             });
@@ -93,6 +92,9 @@ export abstract class JavaBase {
           const message =
             error instanceof Error ? error.message : JSON.stringify(error);
           core.error(`Java setup process failed due to: ${message}`);
+          if (typeof error?.code === 'string') {
+            core.debug(error.stack);
+          }
           const errorDetails = {
             name: error.name,
             message: error.message,
@@ -100,7 +102,6 @@ export abstract class JavaBase {
               .filter(prop => !['name', 'message', 'stack'].includes(prop))
               .reduce((acc, prop) => ({...acc, [prop]: error[prop]}), {})
           };
-          // core.debug(`${JSON.stringify(errorDetails, null, 2)}`);
           Object.entries(errorDetails).forEach(([key, value]) => {
             core.debug(`"${key}": ${JSON.stringify(value)}`);
           });
