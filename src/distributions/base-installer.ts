@@ -86,7 +86,7 @@ export abstract class JavaBase {
               ));
 
           if (retries > 0 && isRetryable) {
-            core.warning(
+            core.debug(
               `Download failed, retrying... (${retries} attempts left)`
             );
             await new Promise(r => setTimeout(r, 2000));
