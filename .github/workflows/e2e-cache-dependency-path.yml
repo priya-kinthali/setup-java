@@ -3,7 +3,7 @@ name: Validate cache with cache-dependency-path option
 on:
   push:
     branches:
-      - main
+      - test-907
       - releases/*
     paths-ignore:
       - '**.md'

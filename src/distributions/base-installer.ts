@@ -51,70 +51,104 @@ export abstract class JavaBase {
       core.info(`Resolved Java ${foundJava.version} from tool-cache`);
     } else {
       core.info('Trying to resolve the latest version from remote');
-      // Mocking tc.HTTPError class
-      class MockHTTPError extends Error {
-        httpStatusCode: number;
 
-        constructor(httpStatusCode: number, message: string) {
-          super(message);
-          this.name = 'HTTPError';
-          this.httpStatusCode = httpStatusCode;
-          Object.setPrototypeOf(this, new.target.prototype); // Restore prototype chain
-        }
-      }
-      try {
-        // Simulate an HTTP error by throwing an instance of MockHTTPError
-        throw new MockHTTPError(403, 'Permission denied or access restricted.');
-      } catch (error: any) {
-        if (error instanceof tc.HTTPError) {
-          if (error.httpStatusCode === 403) {
-            core.error('HTTP 403: Permission denied or access restricted.');
-          } else if (error.httpStatusCode === 429) {
-            core.warning('HTTP 429: Rate limit exceeded. Please retry later.');
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          const javaRelease = await this.findPackageForDownload(this.version);
+          core.info(`Resolved latest version as ${javaRelease.version}`);
+          if (foundJava?.version === javaRelease.version) {
+            core.info(`Resolved Java ${foundJava.version} from tool-cache`);
           } else {
-            core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
+            core.info('Trying to download...');
+            foundJava = await this.downloadTool(javaRelease);
+            core.info(`Java ${foundJava.version} was downloaded`);
           }
-          if (error instanceof Error && error.stack) {
-            core.debug(error.stack);
-            core.debug(JSON.stringify(error, null, 2)); // Log the error object in JSON format
+          break; // Success - exit loop
+        } catch (error: any) {
+          retries--;
+          // Check if error is retryable (including aggregate errors)
+          const retryableCodes = [
+            'ETIMEDOUT',
+            'ECONNRESET',
+            'ENOTFOUND',
+            'ECONNREFUSED'
+          ];
+          const isRetryable =
+            (error instanceof tc.HTTPError &&
+              error.httpStatusCode &&
+              [429, 502, 503, 504].includes(error.httpStatusCode)) ||
+            retryableCodes.includes(error?.code) ||
+            (error?.errors &&
+              Array.isArray(error.errors) &&
+              error.errors.some((err: any) =>
+                retryableCodes.includes(err?.code)
+              ));
+
+          if (retries > 0 && isRetryable) {
+            core.warning(
+              `Download failed, retrying... (${retries} attempts left)`
+            );
+            await new Promise(r => setTimeout(r, 2000));
+            continue;
           }
-        } else if (error && error.errors && Array.isArray(error.errors)) {
-          core.error(
-            `Java setup failed due to network or configuration error(s)`
-          );
-          if (error instanceof Error && error.stack) {
-            core.debug(error.stack);
-            core.debug(JSON.stringify(error, null, 2)); // Log the error object in JSON format
+
+          // Original error handling - unchanged
+          if (error instanceof tc.HTTPError) {
+            if (error.httpStatusCode === 403) {
+              core.error('HTTP 403: Permission denied or access restricted.');
+            } else if (error.httpStatusCode === 429) {
+              core.warning(
+                'HTTP 429: Rate limit exceeded. Please retry later.'
+              );
+            } else {
+              core.error(`HTTP ${error.httpStatusCode}: ${error.message}`);
+            }
+          } else if (error && error.errors && Array.isArray(error.errors)) {
+            core.error(
+              `Java setup failed due to network or configuration error(s)`
+            );
+            if (error instanceof Error && error.stack) {
+              core.debug(error.stack);
+            }
+            for (const err of error.errors) {
+              const endpoint = err?.address || err?.hostname || '';
+              const port = err?.port ? `:${err.port}` : '';
+              const message = err?.message || 'Aggregate error';
+              const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
+              core.error(logMessage);
+              core.debug(`${err.stack || err.message}`);
+              Object.entries(err).forEach(([key, value]) => {
+                core.debug(`"${key}": ${JSON.stringify(value)}`);
+              });
+            }
+          } else {
+            const message =
+              error instanceof Error ? error.message : JSON.stringify(error);
+            core.error(`Java setup process failed due to: ${message}`);
+            if (typeof error?.code === 'string') {
+              core.debug(error.stack);
+            }
+            const errorDetails = {
+              name: error.name,
+              message: error.message,
+              ...Object.getOwnPropertyNames(error)
+                .filter(prop => !['name', 'message', 'stack'].includes(prop))
+                .reduce((acc, prop) => ({...acc, [prop]: error[prop]}), {})
+            };
+            Object.entries(errorDetails).forEach(([key, value]) => {
+              core.debug(`"${key}": ${JSON.stringify(value)}`);
+            });
           }
-          for (const err of error.errors) {
-            const endpoint = err?.address || err?.hostname || '';
-            const port = err?.port ? `:${err.port}` : '';
-            const message = err?.message || 'Aggregate error';
-            const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
-            core.error(logMessage);
-            core.debug(`${err.stack || err.message}`);
-            core.debug(JSON.stringify(err, null, 2));
-          }
-        } else {
-          const message =
-            error instanceof Error ? error.message : JSON.stringify(error);
-          core.error(`Java setup process failed due to: ${message}`);
-          if (error instanceof Error && error.stack) {
-            core.debug(error.stack);
-          }
-          const errorDetails = {
-            name: error.name,
-            message: error.message,
-            ...Object.getOwnPropertyNames(error)
-              .filter(prop => !['name', 'message', 'stack'].includes(prop))
-              .reduce((acc, prop) => ({...acc, [prop]: error[prop]}), {})
-          };
-          core.debug(`${JSON.stringify(errorDetails, null, 2)}`);
+          throw error;
         }
-        throw error;
       }
     }
 
+    // Add null check here
+    if (!foundJava) {
+      throw new Error('Failed to resolve Java version');
+    }
     // JDK folder may contain postfix "Contents/Home" on macOS
     const macOSPostfixPath = path.join(
       foundJava.path,
