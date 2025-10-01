@@ -55,6 +55,13 @@ export abstract class JavaBase {
       let retries = 3;
       while (retries > 0) {
         try {
+          // Clear all console timers before each attempt to prevent conflicts
+          if (retries < 3 && core.isDebug()) {
+            const consoleAny = console as any;
+            if (consoleAny._times && consoleAny._times.clear) {
+              consoleAny._times.clear();
+            }
+          }
           const javaRelease = await this.findPackageForDownload(this.version);
           core.info(`Resolved latest version as ${javaRelease.version}`);
           if (foundJava?.version === javaRelease.version) {
