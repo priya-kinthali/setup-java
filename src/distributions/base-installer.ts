@@ -53,14 +53,18 @@ export abstract class JavaBase {
       core.info('Trying to resolve the latest version from remote');
 
       let retries = 3;
+      const retryableCodes = [
+        'ETIMEDOUT',
+        'ECONNRESET',
+        'ENOTFOUND',
+        'ECONNREFUSED'
+      ];
       while (retries > 0) {
         try {
           // Clear all console timers before each attempt to prevent conflicts
           if (retries < 3 && core.isDebug()) {
             const consoleAny = console as any;
-            if (consoleAny._times && consoleAny._times.clear) {
-              consoleAny._times.clear();
-            }
+            consoleAny._times?.clear?.();
           }
           const javaRelease = await this.findPackageForDownload(this.version);
           core.info(`Resolved latest version as ${javaRelease.version}`);
@@ -75,12 +79,6 @@ export abstract class JavaBase {
         } catch (error: any) {
           retries--;
           // Check if error is retryable (including aggregate errors)
-          const retryableCodes = [
-            'ETIMEDOUT',
-            'ECONNRESET',
-            'ENOTFOUND',
-            'ECONNREFUSED'
-          ];
           const isRetryable =
             (error instanceof tc.HTTPError &&
               error.httpStatusCode &&
