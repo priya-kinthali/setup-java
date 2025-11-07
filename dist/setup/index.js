@@ -129864,17 +129864,19 @@ class JavaBase {
             }
             else {
                 core.info('Trying to resolve the latest version from remote');
-                let retries = 4;
+                const MAX_RETRIES = 4;
+                const RETRY_DELAY_MS = 2000;
                 const retryableCodes = [
                     'ETIMEDOUT',
                     'ECONNRESET',
                     'ENOTFOUND',
                     'ECONNREFUSED'
                 ];
+                let retries = MAX_RETRIES;
                 while (retries > 0) {
                     try {
                         // Clear console timers before each attempt to prevent conflicts
-                        if (retries < 4 && core.isDebug()) {
+                        if (retries < MAX_RETRIES && core.isDebug()) {
                             const consoleAny = console;
                             (_b = (_a = consoleAny._times) === null || _a === void 0 ? void 0 : _a.clear) === null || _b === void 0 ? void 0 : _b.call(_a);
                         }
@@ -129902,7 +129904,7 @@ class JavaBase {
                                 error.errors.some((err) => retryableCodes.includes(err === null || err === void 0 ? void 0 : err.code)));
                         if (retries > 0 && isRetryable) {
                             core.debug(`Attempt failed due to network or timeout issues, initiating retry... (${retries} attempts left)`);
-                            yield new Promise(r => setTimeout(r, 2000));
+                            yield new Promise(r => setTimeout(r, RETRY_DELAY_MS));
                             continue;
                         }
                         if (error instanceof tc.HTTPError) {
@@ -129925,7 +129927,13 @@ class JavaBase {
                                 const endpoint = (err === null || err === void 0 ? void 0 : err.address) || (err === null || err === void 0 ? void 0 : err.hostname) || '';
                                 const port = (err === null || err === void 0 ? void 0 : err.port) ? `:${err.port}` : '';
                                 const message = (err === null || err === void 0 ? void 0 : err.message) || 'Aggregate error';
-                                const logMessage = `${message}${!message.includes(endpoint) ? ` ${endpoint}${port}` : ''}${err.localAddress && err.localPort ? ` - Local (${err.localAddress}:${err.localPort})` : ''}`;
+                                const endpointInfo = !message.includes(endpoint)
+                                    ? ` ${endpoint}${port}`
+                                    : '';
+                                const localInfo = err.localAddress && err.localPort
+                                    ? ` - Local (${err.localAddress}:${err.localPort})`
+                                    : '';
+                                const logMessage = `${message}${endpointInfo}${localInfo}`;
                                 core.error(logMessage);
                                 core.debug(`${err.stack || err.message}`);
                                 Object.entries(err).forEach(([key, value]) => {
@@ -129941,7 +129949,10 @@ class JavaBase {
                             }
                             const errorDetails = Object.assign({ name: error.name, message: error.message }, Object.getOwnPropertyNames(error)
                                 .filter(prop => !['name', 'message', 'stack'].includes(prop))
-                                .reduce((acc, prop) => (Object.assign(Object.assign({}, acc), { [prop]: error[prop] })), {}));
+                                .reduce((acc, prop) => {
+                                acc[prop] = error[prop];
+                                return acc;
+                            }, {}));
                             Object.entries(errorDetails).forEach(([key, value]) => {
                                 core.debug(`"${key}": ${JSON.stringify(value)}`);
                             });
