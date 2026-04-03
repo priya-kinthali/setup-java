@@ -10,6 +10,7 @@ allowed:
   - mit
   - cc0-1.0
   - unlicense
+  - python-2.0
 
 reviewed:
   npm:
